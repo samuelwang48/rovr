@@ -6,12 +6,31 @@
   background: #000;
   color: #fff;
   width: 100%;
+  font-size: 12px;
 }
 .monitor .t {
   margin: 10px;
 }
 .monitor .p {
   margin: 10px;
+}
+.monitor .s {
+  margin: 10px;
+  flex: 0 0 90px;
+}
+.star {
+  color: #32c5ff;
+}
+.monitor .s .stars {
+  display: flex;
+  flex-wrap: wrap;
+}
+.monitor .s .stars .star {
+  font-size: 12px;
+  color: #333;
+}
+.monitor .s .stars .star.light {
+  color: #32c5ff;
 }
 
 .map {
@@ -106,9 +125,6 @@
   overflow: hidden;
   color: #fff;
   text-align: center;
-}
-.star {
-  color: #32c5ff;
 }
 .inskey {
   position: relative;

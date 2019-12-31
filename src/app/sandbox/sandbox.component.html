@@ -1,13 +1,23 @@
 <div class="root">
   <div class="monitor" #monarea>
     <div class="t">
-      Time
+      Time<br />
       {{ timeleftMins | number:'2.0' }}:{{ timeleftSecs | number:'2.0' }}
     </div>
     <div class="p">
       Power
       <div class="power-bar" [style.background]="notimeBg">
         <div class="power-left" [style.width]="timeleftStyle"></div>
+      </div>
+    </div>
+    <div class="s">
+      <div>Stars</div>
+      <div class="stars">
+        <div *ngFor="let d of dest">
+          <fa-icon [icon]="icoStar"
+                   class="star"
+                   [class.light]="d.x === -1 && d.y === -1"></fa-icon>
+        </div>
       </div>
     </div>
   </div>
@@ -30,9 +40,10 @@
           </div>
         </div>
         <div *ngIf="w !== this.rover.x || h !== this.rover.y">
-          <div *ngFor="let r of rock">
+          <div *ngFor="let r of rock; let ri = index" [attr.data-index]="ri">
             <div *ngIf="w === r.x && h === r.y">
               <fa-icon [icon]="icoRock"></fa-icon>
+              <!--{{ri}}-->
             </div>
           </div>
           <div *ngFor="let d of dest">
@@ -50,13 +61,13 @@
       <div>INSTRUCTION TERMINAL</div>
       <div class="inst">
         <div *ngFor="let m of maneuver">
-          <div *ngIf="m === 'forward'">
+          <div *ngIf="m === 'Forward'">
             <fa-icon [icon]="icoInsMoveForward" class="ins"></fa-icon>
           </div>
-          <div *ngIf="m === 'left'">
+          <div *ngIf="m === 'Left'">
             <fa-icon [icon]="icoInsTurnLeft" class="ins sm"></fa-icon>
           </div>
-          <div *ngIf="m === 'right'">
+          <div *ngIf="m === 'Right'">
             <fa-icon [icon]="icoInsTurnRight" class="ins sm"></fa-icon>
           </div>
         </div>
@@ -67,14 +78,14 @@
         <div>
           <fa-icon [icon]="icoMoveForward"
                    class="inskey"
-                   (click)="input('forward')"></fa-icon>
+                   (click)="input('Forward')"></fa-icon>
         </div>
       </div>
       <div class="r1">
         <div>
           <fa-icon [icon]="icoTurnLeft"
                  class="inskey"
-                 (click)="input('left')"></fa-icon>
+                 (click)="input('Left')"></fa-icon>
         </div>
         <div>
           <fa-icon [icon]="icoUndo"
@@ -84,7 +95,7 @@
         <div>
           <fa-icon [icon]="icoTurnRight"
                  class="inskey"
-                 (click)="input('right')"></fa-icon>
+                 (click)="input('Right')"></fa-icon>
         </div>
       </div>
       <div class="r2">

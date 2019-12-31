@@ -43,14 +43,15 @@ export class SandboxComponent implements OnInit {
   icoRock = faExclamationTriangle;
   icoStar = faStar;
 
+  FPS = 5;// per second = 1000/FPS
   MAXTIME = 180;
   WIDTH = 12;
   HEIGHT = 20;
-  ROCKQTY = 10;
-  DESTQTY = 3;
+  ROCKQTY = 20;
+  DESTQTY = 5;
   DIR = ['Up', 'Right', 'Down', 'Left'];
 
-  rover = {x:0, y:0, dir:0};
+  rover = {x: -1, y: -1, dir: -1};
   rock = [];
   dest = [];
   width = [];
@@ -61,6 +62,7 @@ export class SandboxComponent implements OnInit {
   timeleftMins = 0;
   timeleftSecs = 0;
   timer = null;
+  maneuvingTimer = null;
   notimeBg = null;
 
   constructor(private sanitizer: DomSanitizer) { }
@@ -92,21 +94,38 @@ export class SandboxComponent implements OnInit {
 
     this.width = Array(this.WIDTH).fill(0).map((x,i)=>i);
     this.height = Array(this.HEIGHT).fill(0).map((x,i)=>i);
-    this.rover.x = Math.floor(Math.random() * this.WIDTH);
-    this.rover.y = Math.floor(Math.random() * this.HEIGHT);
+
+    const allX = Array(this.WIDTH).fill(0).map((el, i)=>i);
+    const allY = Array(this.HEIGHT).fill(0).map((el, i)=>i);
+    const allCord = [];
+    allX.forEach(x=>{
+      allY.forEach(y=>{
+        allCord.push({x: x, y: y});
+      })
+    });
+
+    this.rock = Array(this.ROCKQTY).fill(0).map(rock => {
+      const ri = Math.floor(Math.random() * allCord.length);
+      rock = allCord[ri];
+      allCord.splice(ri, 1);
+      return rock;
+    });
+
+    this.dest = Array(this.DESTQTY).fill(0).map(dest=>{
+      const ri = Math.floor(Math.random() * allCord.length);
+      dest = allCord[ri];
+      allCord.splice(ri, 1);
+      return dest;
+    });
+
+    this.rover = Array(1).fill(0).map(r=>{
+      const ri = Math.floor(Math.random() * allCord.length);
+      const rover = allCord[ri];
+      allCord.splice(ri, 1);
+      return rover;
+    })[0];
+
     this.rover.dir = Math.floor(Math.random() * this.DIR.length);
-    this.rock = Array(this.ROCKQTY).fill(0).map(x=>{
-      return {
-        x: Math.floor(Math.random() * this.WIDTH),
-        y: Math.floor(Math.random() * this.HEIGHT)
-      }
-    });
-    this.dest = Array(this.DESTQTY).fill(0).map(x=>{
-      return {
-        x: Math.floor(Math.random() * this.WIDTH),
-        y: Math.floor(Math.random() * this.HEIGHT)
-      }
-    });
   }
 
   input(maneuver) {
@@ -119,7 +138,68 @@ export class SandboxComponent implements OnInit {
   }
 
   send() {
+    const dd = this.DIR;
+    const dl = dd.length;
 
+    this.maneuver.forEach((m, i)=>{
+      this.maneuvingTimer = setTimeout(t => {
+        const di = this.rover.dir;
+        const dir = dd[di];
+        const x = this.rover.x;
+        const y = this.rover.y;
+
+        //console.log(m, i, dir, this.rover);
+
+        if (m === 'Left') {
+          this.rover.dir = (dd.indexOf(dir) + dl - 1) % dl;
+        }
+        if (m === 'Right') {
+          this.rover.dir = (dd.indexOf(dir) + 1) % dl;
+        }
+        else if (m === 'Forward') {
+          if (dir === 'Up') {
+            const dy = y - 1;
+            this.move(x, dy, f=>{ this.rover.y = dy; });
+          }
+          else if (dir === 'Right') {
+            const dx = x + 1;
+            this.move(dx, y, f=>{ this.rover.x = dx; });
+          }
+          else if (dir === 'Down') {
+            const dy = y + 1;
+            this.move(x, dy, f=>{ this.rover.y = dy; });
+          }
+          else if (dir === 'Left') {
+            const dx = x - 1;
+            this.move(dx, y, f=>{ this.rover.x = dx; });
+          }
+        }
+      }, 1000/this.FPS*i);
+      this.maneuver = [];
+    });
+
+  }
+
+  move(x, y, f) {
+    if ( x < 0 || y < 0 || x >= this.WIDTH || y >= this.HEIGHT ) {
+      clearTimeout(this.maneuvingTimer);
+      alert('Out of map!');
+    } else {
+      // hitting rocks
+      if (this.rock.find( r => r.x === x && r.y === y )) {
+        clearTimeout(this.maneuvingTimer);
+        alert('Hitting Rock!');
+      } else {
+        // hitting stars
+        const star = this.dest.find( r => r.x === x && r.y === y );
+        if (star) {
+          star.x = -1;
+          star.y = -1;
+          this.dest.sort((a,b) => (a.x > b.x) ? 1 : ((b.x > a.x) ? -1 : 0));
+        }
+        f.apply(this);
+      }
+    }
   }
 
   ngAfterViewInit() {
