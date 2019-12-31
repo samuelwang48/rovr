@@ -1,0 +1,116 @@
+.root {
+  touch-action: manipulation;
+}
+.monitor {
+  display: flex;
+  background: #000;
+  color: #fff;
+  width: 100%;
+}
+.monitor .t {
+  margin: 10px;
+}
+.monitor .p {
+  margin: 10px;
+}
+
+.map {
+  border: 5px solid #000;
+  overflow: auto;
+}
+
+.row {
+  display: flex;
+}
+.col {
+  flex: 0 0 30px;
+}
+.step {
+  text-align: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+  margin-right: -1px;
+  margin-bottom: -1px;
+  font-size: 25px;
+}
+.loc {
+  color: #fff;
+}
+
+.power-bar {
+  background: #fff;
+  width: 200px;
+  height: 10px;
+}
+.power-left {
+  background: #f90;
+  height: 10px;
+}
+.ctrl {
+  font-size: 30px;
+  background: #000;
+  width: 100%;
+  display: flex;
+  position: fixed;
+  bottom: 0;
+}
+.console {
+  border: 1px solid #fff;
+  margin: 10px 20px 20px 10px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 10px;
+  padding: 5px 10px;
+  flex: 1 1 100%;
+}
+.keypad {
+  margin: 20px 10px 15px 0;
+  align-self: flex-end;
+}
+.inst {
+  margin-top: 3px;
+  display: flex;
+  flex-wrap: wrap;
+}
+.inst>div {
+  width: 25px;
+  height: 25px;
+  overflow: hidden;
+}
+.inst .ins {
+  font-size: 35px;
+  color: #fff;
+  margin: 2px;
+  position: relative;
+  top: -10px;
+}
+.ins.sm {
+  font-size: 20px !important;
+  position: relative;
+  top: 0px !important;
+}
+.r0, .r1, .r2 {
+  display: flex;
+  width: 130px;
+  justify-content: center;
+}
+.r0>div,
+.r1>div,
+.r2>div {
+  border: 1px solid #333;
+  border-radius: 5px;
+  width: 40px !important;
+  height: 40px !important;
+  overflow: hidden;
+  color: #fff;
+  text-align: center;
+}
+.star {
+  color: #32c5ff;
+}
+.inskey {
+  position: relative;
+  top: 3px;
+}

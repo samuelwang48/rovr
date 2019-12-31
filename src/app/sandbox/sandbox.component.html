@@ -1,0 +1,99 @@
+<div class="root">
+  <div class="monitor" #monarea>
+    <div class="t">
+      Time
+      {{ timeleftMins | number:'2.0' }}:{{ timeleftSecs | number:'2.0' }}
+    </div>
+    <div class="p">
+      Power
+      <div class="power-bar" [style.background]="notimeBg">
+        <div class="power-left" [style.width]="timeleftStyle"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="map" #maparea>
+    <div *ngFor="let h of height" class="row">
+      <div *ngFor="let w of width" class="col step">
+        <div *ngIf="w === this.rover.x && h === this.rover.y">
+          <div *ngIf="this.rover.dir === 0">
+            <fa-icon [icon]="icoArrowUp" class="loc"></fa-icon>
+          </div>
+          <div *ngIf="this.rover.dir === 1">
+            <fa-icon [icon]="icoArrowRight" class="loc"></fa-icon>
+          </div>
+          <div *ngIf="this.rover.dir === 2">
+            <fa-icon [icon]="icoArrowDown" class="loc"></fa-icon>
+          </div>
+          <div *ngIf="this.rover.dir === 3">
+            <fa-icon [icon]="icoArrowLeft" class="loc"></fa-icon>
+          </div>
+        </div>
+        <div *ngIf="w !== this.rover.x || h !== this.rover.y">
+          <div *ngFor="let r of rock">
+            <div *ngIf="w === r.x && h === r.y">
+              <fa-icon [icon]="icoRock"></fa-icon>
+            </div>
+          </div>
+          <div *ngFor="let d of dest">
+            <div *ngIf="w === d.x && h === d.y">
+              <fa-icon [icon]="icoStar" class="star"></fa-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="ctrl" #ctrlarea>
+    <div class="console">
+      <div>INSTRUCTION TERMINAL</div>
+      <div class="inst">
+        <div *ngFor="let m of maneuver">
+          <div *ngIf="m === 'forward'">
+            <fa-icon [icon]="icoInsMoveForward" class="ins"></fa-icon>
+          </div>
+          <div *ngIf="m === 'left'">
+            <fa-icon [icon]="icoInsTurnLeft" class="ins sm"></fa-icon>
+          </div>
+          <div *ngIf="m === 'right'">
+            <fa-icon [icon]="icoInsTurnRight" class="ins sm"></fa-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="keypad">
+      <div class="r0">
+        <div>
+          <fa-icon [icon]="icoMoveForward"
+                   class="inskey"
+                   (click)="input('forward')"></fa-icon>
+        </div>
+      </div>
+      <div class="r1">
+        <div>
+          <fa-icon [icon]="icoTurnLeft"
+                 class="inskey"
+                 (click)="input('left')"></fa-icon>
+        </div>
+        <div>
+          <fa-icon [icon]="icoUndo"
+                 class="inskey"
+                 (click)="undo()"></fa-icon>
+        </div>
+        <div>
+          <fa-icon [icon]="icoTurnRight"
+                 class="inskey"
+                 (click)="input('right')"></fa-icon>
+        </div>
+      </div>
+      <div class="r2">
+        <div>
+          <fa-icon [icon]="icoSend"
+                   class="inskey"
+                   (click)="send()"></fa-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
