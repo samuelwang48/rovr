@@ -1,5 +1,23 @@
+.splash {
+  text-align: center;
+  font-weight: bold;
+  font-size: 30px;
+  padding-top: 500px;
+}
 .root {
   touch-action: manipulation;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  animation: 0.2s linear fadeIn;
+  height: 100%;
+}
+.root.hidden {
+  margin-left: -10000000px;
+}
+@keyframes fadeIn { 
+  0% {opacity: 0; } 
+  100% {opacity: 1; } 
 }
 .monitor {
   display: flex;
@@ -7,6 +25,7 @@
   color: #fff;
   width: 100%;
   font-size: 12px;
+  height: 100px;
 }
 .monitor .t {
   margin: 10px;
@@ -35,12 +54,11 @@
 .monitor .s .stars .star.light {
   color: #32c5ff;
 }
-
 .map {
   border: 5px solid #000;
   overflow: auto;
+  margin-top: -1px;
 }
-
 .row {
   display: flex;
 }
@@ -75,8 +93,6 @@
   background: #000;
   width: 100%;
   display: flex;
-  position: fixed;
-  bottom: 0;
 }
 .console {
   border: 1px solid #fff;
@@ -86,6 +102,9 @@
   font-size: 10px;
   padding: 5px 10px;
   flex: 1 1 100%;
+}
+.console .alert {
+  color: red;
 }
 .keypad {
   margin: 20px 10px 15px 0;

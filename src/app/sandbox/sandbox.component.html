@@ -1,27 +1,18 @@
-<div class="root">
-  <div class="monitor" #monarea>
-    <div class="t">
-      Time<br />
-      {{ timeleftMins | number:'2.0' }}:{{ timeleftSecs | number:'2.0' }}
-    </div>
-    <div class="p">
-      Power
-      <div class="power-bar" [style.background]="notimeBg">
-        <div class="power-left" [style.width]="timeleftStyle"></div>
-      </div>
-    </div>
-    <div class="s">
-      <div>Stars</div>
-      <div class="stars">
-        <div *ngFor="let d of dest">
-          <fa-icon [icon]="icoStar"
-                   class="star"
-                   [class.light]="d.x === -1 && d.y === -1"></fa-icon>
-        </div>
-      </div>
-    </div>
-  </div>
-  
+<div class="splash" [hidden]="isGameStart">
+  Swipe up to start
+  <br /><br /><br /><br /><br /><br />
+  <br /><br /><br /><br /><br /><br />
+  <br /><br /><br /><br /><br /><br />
+  <br /><br /><br /><br /><br /><br />
+  <br /><br /><br /><br /><br /><br />
+  <br /><br /><br /><br /><br /><br />
+  <br /><br /><br /><br /><br /><br />
+  <br /><br /><br /><br /><br /><br />
+  <br /><br /><br /><br /><br /><br />
+</div>
+<div class="root" [class.hidden]="!isGameStart"
+     (swape)="swipe($event)"
+     (tap)="tap($event)">
   <div class="map" #maparea>
     <div *ngFor="let h of height" class="row">
       <div *ngFor="let w of width" class="col step">
@@ -58,7 +49,7 @@
   
   <div class="ctrl" #ctrlarea>
     <div class="console">
-      <div>INSTRUCTION TERMINAL</div>
+      <div [class.alert]="alerting === true">{{terminaltext}}</div>
       <div class="inst">
         <div *ngFor="let m of maneuver">
           <div *ngIf="m === 'Forward'">
@@ -107,4 +98,28 @@
       </div>
     </div>
   </div>
+
+  <div class="monitor" #monarea>
+    <div class="t">
+      Time<br />
+      {{ timeleftMins | number:'2.0' }}:{{ timeleftSecs | number:'2.0' }}
+    </div>
+    <div class="p">
+      Power
+      <div class="power-bar" [style.background]="notimeBg">
+        <div class="power-left" [style.width]="timeleftStyle"></div>
+      </div>
+    </div>
+    <div class="s">
+      <div>Stars</div>
+      <div class="stars">
+        <div *ngFor="let d of dest">
+          <fa-icon [icon]="icoStar"
+                   class="star"
+                   [class.light]="d.x === -1 && d.y === -1"></fa-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </div>

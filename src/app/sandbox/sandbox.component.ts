@@ -1,6 +1,6 @@
 import * as PF from 'pathfinding';
-import { Component, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
+import { Inject, Component, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
+import { DomSanitizer, DOCUMENT } from '@angular/platform-browser';
 import { faArrowUp,
          faArrowRight,
          faArrowDown,
@@ -18,6 +18,7 @@ import { faArrowUp,
          faUndo,
          faRedo,
 } from '@fortawesome/free-solid-svg-icons';
+
 
 @Component({
   selector: 'app-sandbox',
@@ -47,12 +48,15 @@ export class SandboxComponent implements OnInit {
   FPS = 5;// per second = 1000/FPS
   MAXTIME = 120;
   WIDTH = 12;
-  HEIGHT = 15;
+  HEIGHT = 20;
   ROCKQTY = 40;
   DESTQTY = 5;
   DIR = ['Up', 'Right', 'Down', 'Left'];
 
+  terminaltext = 'INSTRUCTION TERMINAL';
+  alerting = false;
   rover = {x: -1, y: -1, dir: -1};
+  isGameStart = false;
   rock = [];
   dest = [];
   width = [];
@@ -60,19 +64,72 @@ export class SandboxComponent implements OnInit {
   maneuver = [];
   timespent = 0;
   timeleftStyle = {};
+  alarmThreshold = 0.5;
   timeleftMins = 0;
   timeleftSecs = 0;
   timer = null;
   maneuvingTimer = null;
   notimeBg = null;
 
-  constructor(private sanitizer: DomSanitizer) { }
+  constructor(
+    private sanitizer: DomSanitizer,
+    @Inject(DOCUMENT) private document: Document
+  ) { }
+
+  gameStart() {
+    this.isGameStart = true;
+  }
+
+  ngAfterViewInit() {
+    setTimeout(f=>{
+      this.document.documentElement.scrollTop = 0;
+      // console.log(this.document.body.scrollTop);
+      // console.log(window.pageYOffset);
+      window.addEventListener('scroll', this.scroll, true);
+    }, 200);
+  }
+
+  ngOnInit() {
+    this.timelapse();
+    this.width = Array(this.WIDTH).fill(0).map((x,i)=>i);
+    this.height = Array(this.HEIGHT).fill(0).map((x,i)=>i);
+    this.genMap();
+  }
+
+  ngOnDestroy() {
+    window.removeEventListener('scroll', this.scroll, true);
+  }
+
+  swipe(evt) {
+    this.mapArea.nativeElement.focus();
+  }
+
+  tap(evt) {
+    this.mapArea.nativeElement.focus();
+  }
+
+  scroll = (event): void => {
+    // console.log("Scroll Event", window.pageYOffset );
+    if (window.pageYOffset > 200) {
+      window.removeEventListener('scroll', this.scroll, true);
+      // this.document.documentElement.style.overflow = 'hidden';
+      setTimeout( f=> {
+        const bd = 9;
+        const monareaHeight = this.monArea.nativeElement.offsetHeight;
+        const ctrlareaHeight = this.ctrlArea.nativeElement.offsetHeight;
+        const height = window.innerHeight - monareaHeight - ctrlareaHeight - bd;
+        console.log(window.innerHeight, monareaHeight, ctrlareaHeight)
+        this.mapArea.nativeElement.style.height = height + 'px';
+        this.gameStart();
+      }, 200);
+    }
+  };
 
   timelapse() {
     this.timer = setInterval( f => {
       const timeleft = this.MAXTIME - this.timespent;
       const timeleftRatio = timeleft/this.MAXTIME;
-      if (timeleftRatio <= 0.3) {
+      if (timeleftRatio <= this.alarmThreshold) {
         this.notimeBg = this.sanitizer.bypassSecurityTrustStyle('red');
       } else {
         this.notimeBg = this.sanitizer.bypassSecurityTrustStyle('white');
@@ -159,13 +216,6 @@ export class SandboxComponent implements OnInit {
     this.rover = {x: -1, y: -1, dir: -1};
   }
 
-  ngOnInit() {
-    this.timelapse();
-    this.width = Array(this.WIDTH).fill(0).map((x,i)=>i);
-    this.height = Array(this.HEIGHT).fill(0).map((x,i)=>i);
-    this.genMap();
-  }
-
   input(maneuver) {
     this.maneuver.push(maneuver);
     console.log(maneuver)
@@ -218,15 +268,25 @@ export class SandboxComponent implements OnInit {
 
   }
 
+  alert(text) {
+    this.terminaltext = text;
+    this.alerting = true;
+  }
+
+  dismissalert(text) {
+    this.terminaltext = text;
+    this.alerting = false;
+  }
+
   move(x, y, f) {
     if ( x < 0 || y < 0 || x >= this.WIDTH || y >= this.HEIGHT ) {
       clearTimeout(this.maneuvingTimer);
-      alert('Out of map!');
+      this.alert('Out of map!');
     } else {
       // hitting rocks
       if (this.rock.find( r => r.x === x && r.y === y )) {
         clearTimeout(this.maneuvingTimer);
-        alert('Hitting Rock!');
+        this.alert('Hitting Rock!');
       } else {
         // hitting stars
         const star = this.dest.find( r => r.x === x && r.y === y );
@@ -235,17 +295,10 @@ export class SandboxComponent implements OnInit {
           star.y = -1;
           this.dest.sort((a,b) => (a.x > b.x) ? 1 : ((b.x > a.x) ? -1 : 0));
         }
+        this.dismissalert('INSTRUCTION TERMINAL');
         f.apply(this);
       }
     }
   }
 
-  ngAfterViewInit() {
-    setTimeout( f=> {
-      const monareaHeight = this.monArea.nativeElement.offsetHeight;
-      const ctrlareaHeight = this.ctrlArea.nativeElement.offsetHeight;
-      const height = window.innerHeight - monareaHeight - ctrlareaHeight;
-      this.mapArea.nativeElement.style.height = height + 'px';
-    }, 500);
-  }
 }
