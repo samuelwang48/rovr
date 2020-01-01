@@ -42,8 +42,8 @@
         <div *ngIf="w !== this.rover.x || h !== this.rover.y">
           <div *ngFor="let r of rock; let ri = index" [attr.data-index]="ri">
             <div *ngIf="w === r.x && h === r.y">
-              <fa-icon [icon]="icoRock"></fa-icon>
-              <!--{{ri}}-->
+              <fa-icon [icon]="icoRock" class="rock"></fa-icon>
+              <!--{{r.x}},{{r.y}}-->
             </div>
           </div>
           <div *ngFor="let d of dest">

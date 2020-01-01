@@ -1,3 +1,4 @@
+import * as PF from 'pathfinding';
 import { Component, ElementRef, ViewChild, AfterViewInit, OnInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { faArrowUp,
@@ -44,10 +45,10 @@ export class SandboxComponent implements OnInit {
   icoStar = faStar;
 
   FPS = 5;// per second = 1000/FPS
-  MAXTIME = 180;
+  MAXTIME = 120;
   WIDTH = 12;
-  HEIGHT = 20;
-  ROCKQTY = 20;
+  HEIGHT = 15;
+  ROCKQTY = 40;
   DESTQTY = 5;
   DIR = ['Up', 'Right', 'Down', 'Left'];
 
@@ -88,26 +89,27 @@ export class SandboxComponent implements OnInit {
     }, 1000);
   }
 
-  ngOnInit() {
-
-    this.timelapse();
-
-    this.width = Array(this.WIDTH).fill(0).map((x,i)=>i);
-    this.height = Array(this.HEIGHT).fill(0).map((x,i)=>i);
+  genMap() {
 
     const allX = Array(this.WIDTH).fill(0).map((el, i)=>i);
     const allY = Array(this.HEIGHT).fill(0).map((el, i)=>i);
     const allCord = [];
-    allX.forEach(x=>{
-      allY.forEach(y=>{
+    const grid = [];
+
+    allY.forEach(y=>{
+      const row = [];
+      allX.forEach(x=>{
         allCord.push({x: x, y: y});
-      })
+        row.push(0);
+      });
+      grid.push(row);
     });
 
     this.rock = Array(this.ROCKQTY).fill(0).map(rock => {
       const ri = Math.floor(Math.random() * allCord.length);
       rock = allCord[ri];
       allCord.splice(ri, 1);
+      grid[rock.y][rock.x] = 1;
       return rock;
     });
 
@@ -126,6 +128,42 @@ export class SandboxComponent implements OnInit {
     })[0];
 
     this.rover.dir = Math.floor(Math.random() * this.DIR.length);
+
+    const start = [this.rover.x, this.rover.y];
+    const finder = new PF.BestFirstFinder({
+        allowDiagonal: false
+    });
+    
+    // console.log(grid);
+
+    const walkable = [];
+    this.dest.map(d=>[d.x, d.y]).forEach(end => {
+      const pfGrid = new PF.Grid(grid);
+      const path = finder.findPath(...start, ...end, pfGrid);
+      walkable.push(path);
+      // console.log('find', ...start, ...end);
+      // console.log('path', path);
+    });
+
+    console.log(walkable.map(w=>w.length));
+    if (walkable.map(w=>w.length).indexOf(0) > -1) {
+      this.wipe();
+      console.log('recalculate map');
+      this.genMap();
+    }
+  }
+
+  wipe() {
+    this.rock = [];
+    this.dest = [];
+    this.rover = {x: -1, y: -1, dir: -1};
+  }
+
+  ngOnInit() {
+    this.timelapse();
+    this.width = Array(this.WIDTH).fill(0).map((x,i)=>i);
+    this.height = Array(this.HEIGHT).fill(0).map((x,i)=>i);
+    this.genMap();
   }
 
   input(maneuver) {
